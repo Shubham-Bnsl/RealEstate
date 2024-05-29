@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar:{
         type: String,
-        default:"https://st4.depositphotos.com/4259987/24254/i/450/depositphotos_242540222-stock-photo-close-architect-formal-wear-helmet.jpg"        
+        default:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYFouvtAK07DwRgNkso8FUVZdb82mwfpeSp-N8W2eAdQ&s"        
     },
 }, {timestamps: true});
 
