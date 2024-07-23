@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "../firebase";
+import { updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -10,6 +12,7 @@ const Profile = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({})
+  const dispatch = useDispatch();
 
   // console.log(file);
   // console.log(filePerc);
@@ -43,11 +46,25 @@ const Profile = () => {
       )
     })
   };
+  const handleChange = (e)=>{
 
-  return (
+      setFormData({...formData, [e.target.id]: e.target.value });
+  }
+
+  const handleSubmit = () =>{
+    e.prevent.default();
+
+    try {
+      
+    } catch (error) {
+      dispatch(updateUserFailure(error.message))
+    }
+  }
+
+    return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -67,20 +84,25 @@ const Profile = () => {
         <input
           type="text"
           placeholder="username"
+          defaultValue={currentUser.username}
           id="username"
           className="border p-3 rounded-lg"
-        />
+          onChange={handleChange}
+          />
         <input
           type="email"
           placeholder="email"
+          defaultValue={currentUser.email}
           id="email"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
           id="password"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95">
           Update

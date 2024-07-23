@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar:{
         type: String,
-        default:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYFouvtAK07DwRgNkso8FUVZdb82mwfpeSp-N8W2eAdQ&s"        
+        default:"https://img.freepik.com/free-vector/simple-vibing-cat-square-meme_742173-4493.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1721692800&semt=sph"        
     },
 }, {timestamps: true});
 
