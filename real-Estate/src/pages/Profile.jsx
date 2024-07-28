@@ -15,22 +15,34 @@ import {
 
 const Profile = () => {
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser,loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
   const dispatch = useDispatch();
 
   // console.log(file);
   // console.log(filePerc);
   // console.log(formData)
 
+
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
   }, [file]);
+
+  // useEffect(() => {
+  //   if (updateSuccess) {
+  //     const timer = setTimeout(() => {
+  //       setUpdateSuccess(false);
+  //     }, 3000); // Clear updateSuccess after 3 seconds
+  //     return () => clearTimeout(timer); // Cleanup the timer on component unmount or before re-setting the timer
+  //   }
+  // }, [updateSuccess]);
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -56,14 +68,31 @@ const Profile = () => {
       }
     );
   };
-  const handleChange = (e) => {
+  const handleChange =async (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    e.prevent.default();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUpdateSuccess(false);
     try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
@@ -82,7 +111,7 @@ const Profile = () => {
         />
         <img
           onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
+          src={formData?.avatar || currentUser.avatar}
           alt="profile img"
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
@@ -122,14 +151,17 @@ const Profile = () => {
           className="border p-3 rounded-lg"
           onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95">
-          Update
+        <button disabled={loading} className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95">
+          {loading ? 'Loading...' : 'Update'}
         </button>
       </form>
       <div className="flex justify-between mt-3">
         <span className="text-red-700 cursor-pointer">Delete account</span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
+
+      <p className="text-red-700 mt-5">{error ? error:' '}</p>
+      <p className="text-green-700 mt-5" >{updateSuccess ? 'User is updated successfully! ': ' '}</p>
     </div>
   );
 };
